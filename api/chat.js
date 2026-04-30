@@ -42,7 +42,7 @@ Bench Tasks: يوم = الموظف يختار · يومان-ثلاثة = Team Le
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: SYSTEM, messages })
+      body: JSON.stringify({ model: 'claude-sonnet-4-5, max_tokens: 1000, system: SYSTEM, messages })
     });
     const data = await response.json();
     if (!response.ok) return res.status(response.status).json(data);
