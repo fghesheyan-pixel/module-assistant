@@ -16,7 +16,7 @@
  --border: #D5CFC8;
  --text: #3A3A3A;
  --muted: #8A8880;
- --green: #6B8F6B;
+ --red: #C0392B;
 }
 
 - { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -32,7 +32,6 @@ flex-direction: column;
 
 .header {
 background: var(–dark);
-color: var(–cream);
 padding: 14px 20px;
 display: flex;
 align-items: center;
@@ -46,9 +45,10 @@ z-index: 100;
 font-family: ‘DM Serif Display’, serif;
 font-size: 18px;
 letter-spacing: 0.1em;
+color: var(–cream);
 }
 
-.dept-pill {
+.user-pill {
 background: var(–sage);
 color: var(–dark);
 padding: 4px 12px;
@@ -59,6 +59,10 @@ display: none;
 cursor: pointer;
 border: none;
 font-family: ‘DM Sans’, sans-serif;
+max-width: 160px;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
 }
 
 /* WELCOME */
@@ -69,27 +73,17 @@ flex-direction: column;
 justify-content: center;
 align-items: center;
 padding: 32px 20px;
-gap: 28px;
+gap: 32px;
 }
-
-.welcome-top { text-align: center; }
 
 .welcome-title {
 font-family: ‘DM Serif Display’, serif;
-font-size: 26px;
+font-size: 28px;
 color: var(–dark);
-margin-bottom: 8px;
+text-align: center;
 }
 
-.welcome-sub {
-font-size: 14px;
-color: var(–muted);
-line-height: 1.6;
-max-width: 300px;
-margin: 0 auto;
-}
-
-.select-wrapper {
+.form-wrapper {
 width: 100%;
 max-width: 360px;
 display: flex;
@@ -97,10 +91,10 @@ flex-direction: column;
 gap: 10px;
 }
 
-.select-label {
+.field-label {
 font-size: 12px;
 color: var(–muted);
-letter-spacing: 0.05em;
+margin-bottom: 2px;
 }
 
 .custom-select { position: relative; }
@@ -112,7 +106,7 @@ padding-left: 36px;
 background: white;
 border: 1.5px solid var(–border);
 border-radius: 12px;
-font-size: 15px;
+font-size: 14px;
 font-family: ‘DM Sans’, sans-serif;
 color: var(–text);
 appearance: none;
@@ -136,22 +130,31 @@ pointer-events: none;
 font-size: 13px;
 }
 
-.name-input {
+.field-input {
 width: 100%;
 padding: 14px 16px;
 background: white;
 border: 1.5px solid var(–border);
 border-radius: 12px;
-font-size: 15px;
+font-size: 14px;
 font-family: ‘DM Sans’, sans-serif;
 color: var(–text);
 outline: none;
 transition: border-color 0.2s;
-direction: rtl;
+direction: ltr;
+text-align: left;
 }
 
-.name-input:focus { border-color: var(–sage); }
-.name-input::placeholder { color: var(–muted); }
+.field-input:focus { border-color: var(–sage); }
+.field-input::placeholder { color: var(–muted); direction: rtl; text-align: right; }
+.field-input.error { border-color: var(–red); }
+
+.error-msg {
+font-size: 12px;
+color: var(–red);
+display: none;
+padding: 0 4px;
+}
 
 .start-btn {
 width: 100%;
@@ -166,6 +169,7 @@ cursor: pointer;
 opacity: 0.4;
 pointer-events: none;
 transition: opacity 0.2s;
+margin-top: 4px;
 }
 
 .start-btn.ready { opacity: 1; pointer-events: all; }
@@ -220,8 +224,8 @@ font-size: 12px;
 cursor: pointer;
 font-family: ‘DM Sans’, sans-serif;
 color: var(–text);
-transition: all 0.15s;
 white-space: nowrap;
+transition: all 0.15s;
 }
 
 .qbtn:active { background: var(–warm); border-color: var(–warm); }
@@ -346,39 +350,45 @@ justify-content: center;
 
 <div class="header">
 <div class="logo">MODULE</div>
-<button class="dept-pill" id="dept-pill" onclick="resetToWelcome()"></button>
+<button class="user-pill" id="user-pill" onclick="resetToWelcome()"></button>
 </div>
+
+<!-- WELCOME -->
 
 <div id="welcome-screen">
-<div class="welcome-top">
 <div class="welcome-title">المساعد الداخلي</div>
-<div class="welcome-sub">مبني على وثائق وسياسات موديول — يجاوب من مرجعية، لا من رأيه</div>
-</div>
 
-<div class="select-wrapper">
-<div class="select-label">اختر قسمك</div>
+<div class="form-wrapper">
+
+```
+<div class="field-label">الإيميل</div>
+<input class="field-input" id="email-input" type="email"
+ placeholder="name@module.sa"
+ oninput="checkReady()" onblur="validateEmail()" />
+<div class="error-msg" id="email-error">يجب أن يكون الإيميل من @module.sa</div>
+
+<div class="field-label" style="margin-top:6px">القسم</div>
 <div class="custom-select">
 <select id="dept-select" onchange="checkReady()">
 <option value="">— اختر —</option>
-<option value="design">✏️  التصميم — Design</option>
-<option value="pmo">📊  إدارة المشاريع — PMO</option>
-<option value="technical">🔧  الفني — Technical</option>
-<option value="finance">💰  المالية — Finance</option>
-<option value="hr">👥  الموارد البشرية — HR</option>
-<option value="admin">🏢  الإدارة — Admin</option>
-<option value="bd">🤝  التطوير والتسويق — BD</option>
-<option value="all">🌐  عام — General</option>
+<option value="design">التصميم</option>
+<option value="pmo">إدارة المشاريع</option>
+<option value="technical">الفني</option>
+<option value="finance">المالية</option>
+<option value="hr">الموارد البشرية</option>
+<option value="admin">الإدارة</option>
+<option value="bd">التطوير والتسويق</option>
+<option value="all">عام</option>
 </select>
 </div>
-
-```
-<input class="name-input" id="name-input" type="text" placeholder="اسمك (اختياري)" oninput="checkReady()" />
 
 <button class="start-btn" id="start-btn" onclick="startChat()">ابدأ ←</button>
 ```
 
 </div>
 </div>
+
+<!-- CHAT -->
 
 <div id="chat-screen">
 <div class="messages" id="messages">
@@ -414,7 +424,78 @@ const DEPTS = {
  all:       { ar: 'عام',              quick: ['طلب إجازة','صلاحياتي','مراحل المشروع','العميل ما رد','العمل عن بُعد'] }
 };
 
-let dept='', deptAr='', userName='', history=[], busy=false;
+let dept='', deptAr='', userEmail='', history=[], busy=false;
+
+function validateEmail() {
+ const val = document.getElementById('email-input').value.trim().toLowerCase();
+ const errEl = document.getElementById('email-error');
+ const inputEl = document.getElementById('email-input');
+ if (val && !val.endsWith('@module.sa')) {
+   errEl.style.display = 'block';
+   inputEl.classList.add('error');
+   return false;
+ } else {
+   errEl.style.display = 'none';
+   inputEl.classList.remove('error');
+   return true;
+ }
+}
+
+function checkReady() {
+ const email = document.getElementById('email-input').value.trim().toLowerCase();
+ const dept = document.getElementById('dept-select').value;
+ const validEmail = email.endsWith('@module.sa') && email.length > '@module.sa'.length;
+ const btn = document.getElementById('start-btn');
+ btn.classList.toggle('ready', validEmail && !!dept);
+}
+
+function startChat() {
+ const email = document.getElementById('email-input').value.trim().toLowerCase();
+ dept = document.getElementById('dept-select').value;
+ if (!email.endsWith('@module.sa') || !dept) return;
+
+ userEmail = email;
+ deptAr = DEPTS[dept].ar;
+
+ // Extract name from email
+ const namePart = email.split('@')[0];
+ const displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+
+ document.getElementById('welcome-screen').style.display = 'none';
+ document.getElementById('chat-screen').style.display = 'flex';
+
+ const pill = document.getElementById('user-pill');
+ pill.textContent = `${displayName} · ${deptAr}`;
+ pill.style.display = 'block';
+
+ document.getElementById('wb-title').textContent = `مرحباً ${displayName} 👋`;
+ document.getElementById('wb-text').textContent = `أنا مساعد قسم ${deptAr}. اسألني عن أي إجراء أو سياسة.`;
+
+ const qb = document.getElementById('quick-btns');
+ qb.innerHTML = '';
+ DEPTS[dept].quick.forEach(q => {
+   const b = document.createElement('button');
+   b.className = 'qbtn'; b.textContent = q;
+   b.onclick = () => { document.getElementById('txt').value = q; send(); };
+   qb.appendChild(b);
+ });
+
+ history = [];
+ document.getElementById('txt').focus();
+}
+
+function resetToWelcome() {
+ document.getElementById('chat-screen').style.display = 'none';
+ document.getElementById('welcome-screen').style.display = 'flex';
+ document.getElementById('user-pill').style.display = 'none';
+ document.getElementById('dept-select').value = '';
+ document.getElementById('email-input').value = '';
+ document.getElementById('start-btn').classList.remove('ready');
+ const msgs = document.getElementById('messages');
+ while (msgs.children.length > 1) msgs.removeChild(msgs.lastChild);
+ document.getElementById('wb').style.display = 'block';
+ history = [];
+}
 
 function sysPrompt() {
  return `أنت المساعد الداخلي لشركة موديول (MODULE) — مكتب هندسي ومعماري في الرياض.
@@ -428,7 +509,7 @@ function sysPrompt() {
 فهد غشيان — Founder. يحضر فقط في 4 لحظات مع العميل. لا يعطي تعليقات مباشرة — يطرح أسئلة فقط.
 
 ## القسم الحالي
-المستخدم: ${userName||'غير محدد'} — القسم: ${deptAr} (${dept})
+المستخدم: ${userEmail} — القسم: ${deptAr} (${dept})
 
 ## الفريق
 التصميم: داني (DM)، ريجاب (Lead A)، عياد (Lead B)، آدم، جودت، فيشنو
@@ -449,7 +530,7 @@ Pre-Design → Concept 120h → SD 120h → DD 120h → CD 80h → PMO 40h = 480
 DM: 40% | Deputy DM: 75% | Team Leads: 80% | Senior+Architects: 85%
 
 ## تأخر العميل
-يوم 1-5: 🟢 طبيعي | يوم 6: 🟡 Follow-up رسمي | يوم 11: 🔴 Reschedule + إبلاغ مؤسس | يوم 15: 🔴 Frozen
+يوم 1-5: طبيعي | يوم 6: Follow-up رسمي | يوم 11: Reschedule + إبلاغ مؤسس | يوم 15: Frozen
 
 ## صلاحيات
 أقل من 5k ريال: رئيس القسم | 5k-20k: رئيس القسم يوصي + مؤسس يوافق | أكثر من 20k: مؤسس فقط
@@ -458,7 +539,7 @@ DM: 40% | Deputy DM: 75% | Team Leads: 80% | Senior+Architects: 85%
 
 ## HR
 ساعات: الأحد-الخميس 9ص-6م
-إجازة سنوية: 21 يوم (<5 سنوات)، 30 يوم (5+)
+إجازة سنوية: 21 يوم (أقل من 5 سنوات)، 30 يوم (5+)
 إجازة مرضية: 30 يوم كامل + 60 يوم 75% + 30 يوم بدون
 إجازة زواج: 5 أيام | ولادة: 3 أيام | وفاة: 3 أيام | حج: 10 أيام
 طلب الإجازة: 14 يوم مسبقاً عبر HR@module.sa
@@ -472,60 +553,13 @@ Not Approved → جولة جديدة أو VO
 لا عمل قبل موافقة خطية + دفع. PMO يُصدر VO Impact Report خلال يوم، يُرسل خلال 3 أيام.
 
 ## ربحية
-70%: 🟡 تنبيه DM | 90%: 🔴 إبلاغ مؤسس بـ3 أرقام | 100%+: لا نطاق إضافي بدون VO
+70%: تنبيه DM | 90%: إبلاغ مؤسس بـ3 أرقام | 100%+: لا نطاق إضافي بدون VO
 
 ## أسلوب الإجابة
 سؤال واضح → أجب مباشرة واذكر المرجع
 سؤال غامض → اسأل سؤالاً واحداً
 وضع معقد → حاوره خطوة بخطوة
 إجراء غير موجود → [GAP] + اسأل لتفهم المشكلة كاملاً`;
-}
-
-function checkReady() {
- const d = document.getElementById('dept-select').value;
- document.getElementById('start-btn').classList.toggle('ready', !!d);
-}
-
-function startChat() {
- dept = document.getElementById('dept-select').value;
- if (!dept) return;
- deptAr = DEPTS[dept].ar;
- userName = document.getElementById('name-input').value.trim();
-
- document.getElementById('welcome-screen').style.display = 'none';
- document.getElementById('chat-screen').style.display = 'flex';
-
- const pill = document.getElementById('dept-pill');
- pill.textContent = deptAr;
- pill.style.display = 'block';
-
- document.getElementById('wb-title').textContent = `مرحباً${userName?' '+userName:''} 👋`;
- document.getElementById('wb-text').textContent = `أنا مساعد قسم ${deptAr}. اسألني عن أي إجراء أو سياسة.`;
-
- const qb = document.getElementById('quick-btns');
- qb.innerHTML = '';
- DEPTS[dept].quick.forEach(q => {
-   const b = document.createElement('button');
-   b.className = 'qbtn'; b.textContent = q;
-   b.onclick = () => { document.getElementById('txt').value = q; send(); };
-   qb.appendChild(b);
- });
-
- history = [];
- document.getElementById('txt').focus();
-}
-
-function resetToWelcome() {
- document.getElementById('chat-screen').style.display = 'none';
- document.getElementById('welcome-screen').style.display = 'flex';
- document.getElementById('dept-pill').style.display = 'none';
- document.getElementById('dept-select').value = '';
- document.getElementById('name-input').value = '';
- document.getElementById('start-btn').classList.remove('ready');
- const msgs = document.getElementById('messages');
- while (msgs.children.length > 1) msgs.removeChild(msgs.lastChild);
- document.getElementById('wb').style.display = 'block';
- history = [];
 }
 
 function handleKey(e) {
@@ -560,7 +594,7 @@ async function send() {
    });
 
    const data = await res.json();
-   const reply = data.content?.[0]?.text || data.error || 'حدث خطأ — حاول مرة ثانية.';
+   const reply = data.content?.[0]?.text || data.reply || data.error || 'حدث خطأ — حاول مرة ثانية.';
    history.push({ role: 'assistant', content: reply });
    showTyping(false);
 
@@ -623,7 +657,7 @@ async function logGap(question, reply) {
      body: JSON.stringify({
        timestamp: new Date().toISOString(),
        department: deptAr, department_en: dept,
-       user: userName||'غير محدد',
+       user: userEmail,
        question, ai_response: reply.substring(0,500), type: 'GAP'
      })
    });
